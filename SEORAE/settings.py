@@ -1,9 +1,4 @@
 from pathlib import Path
-import os
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
 import os, json
 from django.core.exceptions import ImproperlyConfigured
 
@@ -22,6 +17,7 @@ def get_secret(setting):
         error_msg = "Set the {} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = get_secret("SECRET_KEY")
 

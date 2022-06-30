@@ -401,8 +401,8 @@ def like(request):
             writer.like_count -= 1
             writer.save()
             board.save()
-        elif not login_session:
-            message = "비로그인"
+    elif not login_session:
+        message = "비로그인"
     else:
         board.like.add(login_session)
         message = "추천"
