@@ -1,0 +1,49 @@
+{% extends 'home/index.html' %} {% block contents %}
+<div class="content">
+  <form action="" method="POST">
+    <div class="row mt-5">
+      <div class="col-12 text-center">
+        <h1>비밀번호변경</h1>
+      </div>
+    </div>
+    {% csrf_token %}
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="mb-3">
+          <label for="user_pw" class="form-label">변경할 비밀번호</label>
+          <input
+            type="password"
+            class="form-control"
+            id="user_pw"
+            placeholder="변경하실 비밀번호를 입력해주세요."
+            name="user_pw"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="user_pw_confirm" class="form-label">비밀번호 확인</label>
+          <input
+            type="password"
+            class="form-control"
+            id="user_pw_confirm"
+            placeholder="비밀번호를 다시 입력해주세요."
+            name="user_pw_confirm"
+          />
+        </div>
+        <button
+          type="submit"
+          class="btn btn-outline-primary"
+          value="register"
+          style="float: right"
+        >
+          수정하기
+        </button>
+      </div>
+    </div>
+  </form>
+  {% if error %}
+  <div class="row mt-5">
+    <div class="col-12">{{ error }}</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock contents %}

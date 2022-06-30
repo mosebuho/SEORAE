@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+  {% load static %}
+  <head>
+    <title>서레</title>
+    <link rel="stylesheet" href="/static/bootstrap.min.css/" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <style>
+      @import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
+      html,
+      body {
+        height: 100%;
+        font-family: "Jeju Gothic", sans-serif;
+        color: gray;
+      }
+      div#wrap {
+        width: 1250px;
+        margin: 0 auto;
+        min-height: 100%;
+        position: relative;
+        padding-bottom: 150px;
+      }
+      header#header {
+        height: 200px;
+        text-align: center;
+      }
+      footer#footer {
+        width: 100%;
+        height: 100px;
+        position: absolute;
+        bottom: 0;
+      }
+
+      div#warp,
+      header#header,
+      nav#nav,
+      section#container,
+      div.content,
+      aside#aside,
+      footer#footer {
+        padding: 10px;
+      }
+
+      nav#nav ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        background-color: white;
+      }
+      nav#nav ul li {
+        padding: 10px;
+        display: inline-block;
+      }
+      div#up-content {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
+      }
+      div#down-content {
+        display: flex;
+        flex-direction: row;
+      }
+      div#title {
+        width: 430px;
+        height: 50px;
+        font-size: 24px;
+        margin-right: 10px;
+        padding-left: 10px;
+        padding-top: 5px;
+      }
+      div#list {
+        width: 430px;
+        height: 350px;
+        margin-right: 15px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      div#side-title {
+        width: 280px;
+        height: 40px;
+        margin-top: 30px;
+        font-size: 24px;
+        padding-left: 10px;
+        padding-top: 3px;
+      }
+      div#side-list {
+        width: 280px;
+        height: 200px;
+        padding-left: 10px;
+        padding-top: 5px;
+        padding-right: 10px;
+      }
+      div#user-button {
+        text-align: center;
+        margin-top: 15px;
+      }
+      div.content {
+        width: 900px;
+        float: left;
+      }
+      aside#aside {
+        width: 300px;
+        float: right;
+      }
+      section#container::after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+
+      .material-symbols-rounded.fill {
+        font-variation-settings: "FILL" 1, "wght" 100, "GRAD" 200, "opsz" 20;
+      }
+
+      .material-symbols-rounded {
+        font-variation-settings: "FILL" 0, "wght" 100, "GRAD" 200, "opsz" 20;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <header id="header">
+        <h1>
+          <a href="/"><img src="{% static 'seorae.jfif' %}" /></a>
+        </h1>
+      </header>
+      <nav id="nav">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:all' %}"
+              >모든글</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:free' %}"
+              >자유</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:recipe' %}"
+              >레시피</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:hoogie' %}"
+              >후기</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:question' %}"
+              >문의/건의</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              data-bs-toggle="tab"
+              href="{% url 'board:notice' %}"
+              >공지</a
+            >
+          </li>
+        </ul>
+      </nav>
+      <form
+        class="d-flex"
+        action="{% url 'search' %}"
+        method="post"
+        style="height: 35px; margin: 8px 250px 15px"
+      >
+        {% csrf_token %}
+        <input
+          class="form-control me-sm-2"
+          type="text"
+          placeholder="레시피를 검색하세요!"
+          aria-label="Search"
+          name="q"
+          value="{{q}}"
+        />
+        <button
+          class="btn btn-outline-info my-2 my-sm-0"
+          type="submit"
+          style="width: 100px"
+        >
+          검색
+        </button>
+      </form>
+      <section id="container">
+        {% block contents %}
+        <div class="content">
+          <article>
+            <div id="up-content">
+              <div>
+                <div id="title" class="card">최신 글</div>
+                <div id="list" class="card">
+                  <div style="margin-top: 5px">
+                    {% for board in new_board %}
+                    <li style="list-style-type: none">
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: row;
+                          justify-content: space-between;
+                        "
+                      >
+                        <div>
+                          <span>
+                            <a
+                              href="/board/detail/{{ board.id }}"
+                              style="text-decoration: none"
+                              >{{ board.title }}</a
+                            >
+                          </span>
+                          <span style="font-size: 12px">
+                            {{ board.comment_set.count }}
+                          </span>
+                        </div>
+                        <div style="font-size: 12px">
+                          {{board.created_string}}
+                        </div>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div id="title" class="card">인기 글</div>
+                <div id="list" class="card">
+                  <div style="margin-top: 5px">
+                    {% for board in hot_board %}
+                    <li style="list-style-type: none">
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: row;
+                          justify-content: space-between;
+                        "
+                      >
+                        <div>
+                          <span>
+                            <a
+                              href="/board/detail/{{ board.id }}"
+                              style="text-decoration: none"
+                              >{{ board.title }}</a
+                            >
+                          </span>
+                          <span style="font-size: 12px">
+                            {{ board.comment_set.count }}
+                          </span>
+                        </div>
+                        <div style="font-size: 12px">
+                          {{board.created_string}}
+                        </div>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="down-content">
+              <div>
+                <div id="title" class="card">최신 레시피</div>
+                <div id="list" class="card">
+                  <div style="margin-top: 5px">
+                    {% for board in new_recipe %}
+                    <li style="list-style-type: none">
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: row;
+                          justify-content: space-between;
+                        "
+                      >
+                        <div>
+                          <span>
+                            <a
+                              href="/board/detail/{{ board.id }}"
+                              style="text-decoration: none"
+                              >{{ board.title }}</a
+                            >
+                          </span>
+                          <span style="font-size: 12px">
+                            {{ board.comment_set.count }}
+                          </span>
+                        </div>
+                        <div style="font-size: 12px">
+                          {{board.created_string}}
+                        </div>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div id="title" class="card">인기 레시피</div>
+                <div id="list" class="card">
+                  <div style="margin-top: 5px">
+                    {% for board in hot_recipe %}
+                    <li style="list-style-type: none">
+                      <div
+                        style="
+                          display: flex;
+                          flex-direction: row;
+                          justify-content: space-between;
+                        "
+                      >
+                        <div>
+                          <span>
+                            <a
+                              href="/board/detail/{{ board.id }}"
+                              style="text-decoration: none"
+                              >{{ board.title }}</a
+                            >
+                          </span>
+                          <span style="font-size: 12px">
+                            {{ board.comment_set.count }}
+                          </span>
+                        </div>
+                        <div style="font-size: 12px">
+                          {{board.created_string}}
+                        </div>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+        {% endblock contents %}
+        <aside id="aside">
+          <div id="user-button">
+            {% if login_session %}
+            <a href="/user/profile/{{user.id}}/">
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                style="margin-right: 15px; font-family: Jeju Gothic"
+              >
+                프로필
+              </button></a
+            >
+
+            <a href="{% url 'user:logout' %}">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                style="font-family: Jeju Gothic"
+              >
+                로그아웃
+              </button></a
+            >
+            {% else %}
+            <a href="{% url 'user:login' %}">
+              <button
+                type="button"
+                class="btn btn-outline-primary"
+                style="margin-right: 15px; font-family: Jeju Gothic"
+              >
+                로그인
+              </button></a
+            >
+            <a href="{% url 'user:register' %}">
+              <button
+                type="button"
+                class="btn btn-outline-info"
+                style="font-family: Jeju Gothic"
+              >
+                회원가입
+              </button></a
+            >
+            {% endif %}
+          </div>
+          <div id="side-ranking">
+            <div id="side-title" class="card">장인</div>
+            <div id="side-list" class="card">
+              {% for user in hot_users %}
+              <li style="list-style-type: none">
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                  "
+                >
+                  <div>
+                    <a
+                      href="/user/profile/{{ user.id }}/"
+                      style="text-decoration: none"
+                      >{{ user.user_name }}</a
+                    >
+                  </div>
+                  <div style="font-size: 10px">{{ user.like_count }}</div>
+                </div>
+              </li>
+              {% endfor %}
+            </div>
+          </div>
+          <div id="side-ranking">
+            <div id="side-title" class="card">새로운 회원</div>
+            <div id="side-list" class="card">
+              {% for user in new_users %}
+              <li style="list-style-type: none">
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                  "
+                >
+                  <div>
+                    <a
+                      href="/user/profile/{{ user.id }}/"
+                      style="text-decoration: none"
+                      >{{ user.user_name }}</a
+                    >
+                  </div>
+                  <div style="font-size: 10px">{{ user.id }}번째 회원</div>
+                </div>
+              </li>
+              {% endfor %}
+            </div>
+          </div>
+        </aside>
+      </section>
+      <footer id="footer">
+        <div style="display: flex; justify-content: center; margin-top: 20px">
+          <div>
+            <p>Copyright© 서래 All rights reserved.</p>
+            <p>e-mail : seorae.web@gmail.com</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

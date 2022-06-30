@@ -1,0 +1,92 @@
+{% extends 'user/profile_base.html' %} {% block content %}
+<div class="content">
+  {% if board_comments %}
+  {% for comment in board_comments %}
+  <table class="card" style="margin-top: 5px">
+    <tbody>
+      <tr>
+        <th
+          style="
+            border-right: 1px solid black;
+            padding: 10px;
+            text-align: center;
+          "
+        >
+          게시글
+        </th>
+        <td style="padding-left: 15px">
+          <a
+            href="/board/detail/{{comment.board.id}}/"
+            style="text-decoration: none"
+            >{{ comment.board }}</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border-right: 1px solid black;
+            padding: 10px;
+            text-align: center;
+          "
+        >
+          내용
+        </th>
+        <td style="padding-left: 15px">{{ comment }}</td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border-right: 1px solid black;
+            padding: 10px;
+            text-align: center;
+          "
+        >
+          작성일
+        </th>
+        <td style="padding-left: 15px">{{ comment.created_at }}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% endfor %}
+  <div id="paging">
+    <ul class="pagination pagination-sm justify-content-center" style="margin-top: 2rem">
+      {% if board_comments.has_previous %}
+      <li class="page-item">
+      <a class="page-link" href="?page={{board_comments.previous_page_number}}"><</a>
+      </li>
+      {% endif %} 
+      {% for page_number in board_comments.paginator.page_range %}
+      {% if page_number >= board_comments.number|add:-5 and page_number <= board_comments.number|add:5 %}
+      {% if page_number == board_comments.number %}
+      <li class="page-item active" aria-current="page">
+        <a class="page-link" href="?&page={{ page_number }}"
+          >{{ page_number }}</a
+        >
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a class="page-link" href="?&page={{ page_number }}"
+          >{{ page_number }}</a
+        >
+        {% endif %}
+        {% endif %}
+        {% endfor %} 
+        {% if board_comments.has_next %}
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{board_comments.next_page_number}}">></a>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+{% else %}
+  <div
+  class="card"
+  style="width: 100%; height: 300px; text-align: center; padding: 140px"
+>
+  작성한 댓글이 없습니다.
+</div>
+{% endif %}
+</div>
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% extends 'home/index.html' %} {% block contents %}
+<div class="content">
+  <form action="" method="POST">
+    <fieldset>
+      {% csrf_token %}
+      <div style="display: flex; flex-direction: row">
+        <div style="width:100%">
+          <select
+            type="select"
+            class="form-select"
+            id="board_name"
+            name="board_name"
+          >
+            <option value="free">자유</option>
+            <option value="recipe">레시피</option>
+            <option value="hoogie">후기</option>
+            <option value="question">문의/건의</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <input
+            type="text"
+            class="form-control"
+            id="title"
+            placeholder="제목을 입력해주세요."
+            name="title"
+            style="width:750px;"
+            value="{{ board.title }}"
+          />
+        </div>
+      </div>
+      <p>{{ forms.contents }}</p>
+      <button type="submit" class="btn btn-outline-primary" style="float:right">게시하기</button>
+      {% if error %} {{ error }} {% endif %}
+    </fieldset>
+  </form>
+</div>
+{% endblock contents %}

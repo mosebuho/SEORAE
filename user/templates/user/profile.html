@@ -1,0 +1,126 @@
+{% extends 'user/profile_base.html' %} {% block content %}
+<script
+  src="https://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"
+></script>
+
+<script>
+  function nameedit(value) {
+    var user_id = value;
+    var name = $("#name").val();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'user:name_edit' user.id %}",
+      dataType: "json",
+      data: {
+        user_id: user_id,
+        name: name,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      success: function (response) {
+        $("#name").html(
+          '<div style="display:flex; flex-direction:row;"><div style="width:150px"><input type="text"' +
+            'id="edit_name" class="form-control" value="' +
+            response.name +
+            '"></input></div>' +
+            '<div><a id="name_edit" style="margin-left:5px; color:#78c2ad" type="button">수정</a>' +
+            '<a id="name_cancel" style="margin-left:5px; color:#ff7b7b" type="button">취소</a></div></div></div>'
+        );
+        $("#name_edit").click(function () {
+          var edit_name = $("#edit_name").val();
+          if ($("#edit_name").val().length < 2){ alert('닉네임은 2-8자로 작성해주세요.'); $('#edit_name').focus(); return;}
+          if ($("#edit_name").val().length > 8){ alert('닉네임은 2-8자로 작성해주세요.'); $('#edit_name').focus(); return;}
+          $.ajax({
+            type: "POST",
+            url: "{% url 'user:name_edit_done' user.id %}",
+            dataType: "json",
+            data: {
+              user_id: user_id,
+              edit_name: edit_name,
+              csrfmiddlewaretoken: "{{csrf_token}}",
+            },
+            success: function (response) {
+              $("#name").html(
+                response.edit_name +
+                  '<a onclick="nameedit(' +
+                  response.user_id +
+                  ')" style="margin-left:5px; color: #78c2ad" type="button">변경</a>'
+              );
+            },
+          });
+        });
+        $("#name_cancel").click(function () {
+          $.ajax({
+            type: "POST",
+            url: "{% url 'user:name_edit' user.id %}",
+            dataType: "json",
+            data: {
+              user_id: user_id,
+              name: name,
+              csrfmiddlewaretoken: "{{csrf_token}}",
+            },
+            success: function (response) {
+              $("#name").html(
+                response.name +
+                  '<a onclick="nameedit(' +
+                  response.user_id +
+                  ')" style="margin-left:5px; color: #78c2ad" type="button">변경</a>'
+              );
+            },
+          });
+        });
+      },
+    });
+  }
+</script>
+<table class="mb_table" style="width: 100%">
+  <tbody>
+    <tr style="height: 50px">
+      <th
+        style="border-right: 1px solid black; padding: 10px; text-align: center"
+      >
+        아이디
+      </th>
+      <td style="padding-left: 15px">{{ user.user_id }}</td>
+    </tr>
+    <tr style="height: 50px">
+      <th
+        style="border-right: 1px solid black; padding: 10px; text-align: center"
+      >
+        이메일
+      </th>
+      <td style="padding-left: 15px">{{ user.user_email }}</td>
+    </tr>
+    <tr style="height: 50px">
+      <th
+        style="border-right: 1px solid black; padding: 10px; text-align: center"
+      >
+        닉네임
+      </th>
+      <td style="padding-left: 15px">
+        <div id="name">
+          {{ user.user_name }}
+          <a onclick='nameedit("{{ user.id }}")' style="color: #78c2ad" type="button">변경</a>
+        </div>
+      </td>
+    </tr>
+    <tr style="height: 50px">
+      <th
+        style="border-right: 1px solid black; padding: 10px; text-align: center"
+      >
+        가입일
+      </th>
+      <td style="padding-left: 15px">{{ user.user_register_dttm }}</td>
+    </tr>
+  </tbody>
+</table>
+<div style="float: right">
+  <a href="{% url 'user:mypwchange' user.pk %}" style="text-decoration: none; margin-right:5px;"
+    >비밀번호변경</a
+  >
+  <a href="{% url 'user:user_quit' user.pk %}" style="text-decoration: none; color:#ff7b7b;"
+    >회원탈퇴</a
+  >
+</div>
+{% endblock content %}

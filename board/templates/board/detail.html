@@ -1,0 +1,445 @@
+{% extends 'home/index.html' %} {% block contents %}
+<script
+  src="https://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"
+></script>
+<script type="text/javascript">
+  function board_like(id) {
+    $.ajax({
+      url: "{% url 'board:like' %}",
+      data: {
+        board_id: id,
+      },
+      dataType: "json",
+      success: function (response) {
+        $("#like_count").html(response.like_count);
+        $(".toast").fadeIn(300).delay(6000).fadeOut(300);
+        if (response.message == "취소") {
+          $("#good").attr("class", "material-symbols-rounded");
+        } else if (response.message == "추천") {
+          $("#good").attr("class", "material-symbols-rounded fill");
+        }
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    $("#comment_write").click(function () {
+      var content = $("#content_id").val();
+      var writer = $("#comment_writer").val();
+      if ($("#content_id").val() == ""){ alert('댓글을 입력해주세요.');}
+      $.ajax({
+        type: "POST",
+        url: "{% url 'board:comment_write' board.id %}",
+        dataType: "json",
+        data: {
+          writer: writer,
+          content: content,
+          csrfmiddlewaretoken: "{{csrf_token}}",
+        },
+        success: function (response) {
+          $("#comment_count").html(response.comment_count + "개의 댓글");
+          if (response.self_comment) {
+            $("#comment_list").append(
+              "<div><div id=" +
+                response.comment_id +
+                "><strong>" +
+                response.writer +
+                "&nbsp;<span>" +
+                response.self_comment +
+                "</span></strong>" +
+                '<span style="float:right;">' +
+                response.created_at +
+                "</span>" +
+                '<div><div id="comment_content" style="text-align:left; margin-top:5px;">' +
+                response.content +
+                '</div><div id="comment_button"style="text-align:right;"><a onclick="commentUpdate(' +
+                response.comment_id +
+                ')" style="color: #78c2ad" type="button">수정</a> <a onclick="commentDelete(' +
+                response.comment_id +
+                ')" style="color:#ff7b7b" type="button">삭제</a></div></div><hr></div><div class=' +
+                response.comment_id +
+                "></div>"
+            );
+          } else {
+            $("#comment_list").append(
+              "<div><div id=" +
+                response.comment_id +
+                "><strong>" +
+                response.writer +
+                "</strong>" +
+                '<span style="float:right;">' +
+                response.created_at +
+                "</span>" +
+                '<div><div id="comment_content" style="text-align:left; margin-top:5px;">' +
+                response.content +
+                '</div><div id="comment_button" style="text-align:right;"><a onclick="commentUpdate(' +
+                response.comment_id +
+                ')" style="color: #78c2ad" type="button">수정</a> <a onclick="commentDelete(' +
+                response.comment_id +
+                ')" style="color: #ff7b7b" type="button">삭제</a></div></div><hr></div><div class=' +
+                response.comment_id +
+                "></div>"
+            );
+          }
+          $("#content_id").val("");
+        },
+      });
+    });
+  });
+
+  function commentDelete(value) {
+    var comment_id = value;
+    var delete_warning = confirm("댓글을 삭제하시겠습니까?");
+    if (delete_warning == true) {
+      $.ajax({
+        type: "POST",
+        url: "{% url 'board:comment_delete' board.id %}",
+        dataType: "json",
+        data: {
+          comment_id: comment_id,
+          csrfmiddlewaretoken: "{{csrf_token}}",
+        },
+        success: function (response) {
+          $("#" + response.comment_id).replaceWith(
+            '<span style="color:gray;">삭제된 댓글입니다.</span><hr>'
+          );
+        },
+        error: function () {
+          alert("본인 댓글이 아닙니다.");
+        },
+      });
+    }
+  }
+
+  function commentUpdate(value) {
+    var comment_id = value;
+    var content = $("#content_id").val();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'board:comment_update' board.id %}",
+      dataType: "json",
+      data: {
+        comment_id: comment_id,
+        content: content,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      success: function (response) {
+        var comment_content = $("#" + response.comment_id).find(
+          "#comment_content"
+        );
+        var comment_button = $("#" + response.comment_id).find(
+          "#comment_button"
+        );
+        $(comment_content).html(
+          '<textarea class="form-control" id="edit_content" rows="3">' +
+            response.content +
+            "</textarea>"
+        );
+        $(comment_button).html(
+          '<div style="text-align:right; margin-top:5px;"><button id="comment_update" class="btn btn-outline-primary btn-sm">수정</button>' +
+            '<button id="update_cancel" class="btn btn-outline-secondary btn-sm" style="margin-left:10px;">취소</button></div>'
+        );
+        $("#comment_update").click(function () {
+          var edit_content = $("#edit_content").val();
+          if ($("#edit_content ").val() == ""){ alert('댓글을 입력해주세요.');}
+          $.ajax({
+            type: "POST",
+            url: "{% url 'board:comment_update_done' board.id %}",
+            dataType: "json",
+            data: {
+              comment_id: comment_id,
+              edit_content: edit_content,
+              csrfmiddlewaretoken: "{{csrf_token}}",
+            },
+            success: function (response) {
+              $(comment_content).html(response.edit_content);
+              $(comment_button).html(
+                "</div><div style='text-align: right'>" +
+                  "<a onclick='commentUpdate(" +
+                  response.comment_id +
+                  ")'style='margin-right:5px; color: #78c2ad' type='button'>수정</a>" +
+                  "<a onclick='commentDelete(" +
+                  response.comment_id +
+                  ")'style='color: #ff7b7b' type='button'>삭제</a></div>"
+              );
+            },
+          });
+        });
+        $("#update_cancel").click(function () {
+          $.ajax({
+            type: "POST",
+            url: "{% url 'board:comment_update' board.id %}",
+            dataType: "json",
+            data: {
+              comment_id: comment_id,
+              content: content,
+              csrfmiddlewaretoken: "{{csrf_token}}",
+            },
+            success: function (response) {
+              $(comment_content).html(response.content);
+              $(comment_button).html(
+                '</div><div id="comment_button"style="text-align:right;"><a onclick="commentUpdate(' +
+                  response.comment_id +
+                  ')" style="color: #78c2ad" type="button">수정</a> <a onclick="commentDelete(' +
+                  response.comment_id +
+                  ')" style="color:#ff7b7b" type="button">삭제</a></div></div></div><div class=' +
+                  response.comment_id +
+                  "></div>"
+              );
+            },
+          });
+        });
+      },
+    });
+  }
+
+  function boardDelete() {
+    var delete_warning = confirm("게시글을 삭제하시겠습니까?");
+    if (delete_warning == true) {
+        window.location.href = "{% url 'board:delete' board.id %}"
+    }
+  }
+</script>
+<div class="content">
+  <div class="card" style="width: 100%">
+    <div
+      style="
+        display: flex;
+        height: 50px;
+        justify-content: space-between;
+        padding: 14px 0;
+      "
+    >
+      <div style="margin-left: 10px">{{ board.title }}</div>
+      {% if board.writer.id == login_session %}
+      <div style="display: flex; flex-direction: row; margin-right: 15px">
+        <div style="margin-right: 10px">
+          <a
+            href="/board/detail/{{ board.id }}/update/"
+            style="text-decoration: none"
+            >수정</a
+          >
+        </div>
+        <div>
+          <a
+            onclick="boardDelete('{{board.id}}')"
+            type="button"
+            style="text-decoration: none; color: #ff7b7b"
+            >삭제</a
+          >
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div
+    style="
+      width: 100%;
+      height: 50px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 13px 0;
+      margin-top: 7px;
+    "
+    class="card"
+  >
+    <div style="margin-left: 10px">
+      <a
+        href="/user/profile/{{ board.writer.id }}/"
+        style="text-decoration: none"
+        >{{ board.writer }}</a
+      >
+    </div>
+    <div style="display: flex; flex-direction: row">
+      <div style="margin-right: 10px; color: #999; font-size: 13px">
+        <i class="material-symbols-rounded fill"> visibility </i>
+        {{ board.hits }}
+      </div>
+      <div style="margin-right: 10px; color: #999; font-size: 13px">
+        <i class="material-symbols-rounded fill"> thumb_up </i>
+        {{ board.like.count }}
+      </div>
+      <div style="margin-right: 10px; color: #999; font-size: 13px">
+        <i class="material-symbols-rounded fill"> chat </i>
+        {{ comments.count }}
+      </div>
+    </div>
+  </div>
+  <div
+    style="
+      width: 100%;
+      height: auto;
+      min-height: 350px;
+      margin-right: 15px;
+      padding: 10px 0;
+      margin-top: 7px;
+    "
+    class="card"
+  >
+    <div style="margin-left: 10px; min-height: 330px">
+      {{ board.contents|safe }}
+    </div>
+    <div style="text-align: center; margin-bottom: 10px">
+      <button
+        id="{{board.id}}"
+        class="btn btn-outline-primary"
+        onclick="board_like(this.id)"
+      >
+        {% if user in board.like.all %}
+        <i id="good" class="material-symbols-rounded fill"> thumb_up </i>
+        {% else %}
+        <i id="good" class="material-symbols-rounded"> thumb_up </i>
+        {% endif %}
+        <span id="like_count">{{ board.like_count }}</span>
+      </button>
+      {% if not login_session %}
+      <div class="toast" style="width: 100%; margin-top: 15px">
+        <div id="message" style="padding-top: 3px">
+          로그인이 필요한 기능입니다.<br />
+          <a
+            href="/user/login/"
+            style="text-decoration: none; margin-right: 10px"
+            >로그인</a
+          >
+          <a href="/user/register/" style="text-decoration: none">회원가입</a>
+        </div>
+      </div>
+      {% elif user in board.like.all %}
+      <div id="message"></div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background-color: white">
+      <div class="col-md-12">
+        {% csrf_token %}
+        <div class="form-group row">
+          {% if login_session %}
+          <textarea
+            class="form-control"
+            id="content_id"
+            rows="3"
+            placeholder="댓글을 입력하세요."
+          ></textarea>
+          {% else %}
+          <textarea
+            class="form-control"
+            id="content_id"
+            rows="3"
+            placeholder="댓글을 입력하세요."
+            disabled
+          ></textarea>
+          {% endif %}
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-top: 6px;
+          "
+        >
+          <div id="comment_count">{{ board.comment_set.count }}개의 댓글</div>
+          <div>
+            {% if login_session %}
+            <button id="comment_write" class="btn btn-outline-primary">
+              등록
+            </button>
+            {% endif%}
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div id="more_comment">
+        {% if board_comments %} {% for comment in board_comments %}
+        <div id="{{ comment.id }}">
+          {% if comment.deleted %}
+          <span>삭제된 댓글입니다.</span>
+          <hr />
+          {% else %} {% if comment.writer.id == board.writer.id %}
+          <strong>{{ comment.writer }}&nbsp;<span>(글쓴이)</span></strong>
+          {% else %}
+          {% if comment.writer.id == None %}
+          <span style="font-size:14px;">(탈퇴한 회원)</span>
+          {% else %}
+          <strong>{{ comment.writer }}</strong>
+          {% endif %}
+          {% endif %}
+          <span style="float: right">{{ comment.created_string }}</span>
+          {% if comment.writer.id == login_session %}
+          <div id="comment_content" style="text-align: left; margin-top: 5px">
+            <div>{{ comment.content }}</div>
+          </div>
+          {% if not login_session %}
+          {% else %}
+          <div id="comment_button" style="text-align: right">
+            <a onclick="commentUpdate('{{comment.id}}')" style="color: #78c2ad" type="button"
+            >수정</a
+            >
+            <a onclick="commentDelete('{{comment.id}}')" style="color: #ff7b7b" type="button"
+            >삭제</a
+            >
+          </div>
+          {% endif %}
+          <hr />
+          {% else %}
+          <div>
+            <div style="text-align: left; margin-top: 5px">
+              {{ comment.content }}
+            </div>
+          </div>
+          <hr />
+          {% endif %} {% endif %}
+        </div>
+        <div class="{{ comment.id }}"></div>
+        {% endfor %} {% endif %}
+        <input type="hidden" id="comment_writer" value="{{writer}}" />
+        <div id="comment_list"></div>
+        <div id="paging">
+          <ul
+            class="pagination pagination-sm justify-content-center"
+            style="margin-top: 2rem"
+          >
+            {% if board_comments.has_previous %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{board_comments.previous_page_number}}"
+                ><</a
+              >
+            </li>
+            {% endif %} 
+            {% for page_number in board_comments.paginator.page_range %} 
+            {% if page_number >= board_comments.number|add:-5 and page_number <= board_comments.number|add:5 %} 
+            {% if page_number == board_comments.number %}
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="?&page={{ page_number }}"
+                >{{ page_number }}</a
+              >
+            </li>
+            {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?&page={{ page_number }}"
+                >{{ page_number }}</a
+              >
+              {% endif %} {% endif %} {% endfor %} 
+              {% if board_comments.has_next %}
+            </li>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="?page={{board_comments.next_page_number}}"
+                >></a
+              >
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock contents %}

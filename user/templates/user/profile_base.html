@@ -1,0 +1,42 @@
+{% extends 'home/index.html' %} {% block contents %}
+<div class="content">
+  <h2><div class="card" style="height: 90px"></div></h2>
+  <nav id="nav">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="tab"
+          href="{% url 'user:profile' user.pk %}"
+          >회원 정보</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="tab"
+          href="{% url 'user:myboard' user.pk %}"
+          >작성한 글</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="tab"
+          href="{% url 'user:mycomment' user.pk %}"
+          >작성한 댓글</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-toggle="tab"
+          href="{% url 'user:mylikeboard' user.pk %}"
+          >추천한 글</a
+        >
+      </li>
+    </ul>
+  </nav>
+  {% block content %} {% endblock content %}
+</div>
+{% endblock contents %}

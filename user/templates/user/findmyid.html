@@ -1,0 +1,58 @@
+{% extends 'home/index.html' %} {% block contents %}
+<script
+  src="https://code.jquery.com/jquery-3.5.1.js"
+  integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+  crossorigin="anonymous"
+></script>
+<script type="text/javascript">
+  function findmyid() {
+    var user_email = $("#user_email").val();
+    if ($("#user_email").val() == "") {
+      alert("이메일을 입력해주세요.");
+    }
+    $.ajax({
+      type: "POST",
+      url: "{% url 'user:findmyid_done' %}",
+      dataType: "json",
+      data: {
+        user_email: user_email,
+        csrfmiddlewaretoken: "{{csrf_token}}",
+      },
+      success: function () {
+        alert("이메일이 전송되었습니다.");
+      },
+    });
+  }
+</script>
+<div class="content">
+  <div class="row mt-5">
+    <div class="col-12 text-center">
+      <h1>계정 찾기</h1>
+      <br />
+      회원 정보에 등록된 이메일로 계정 정보가 전송됩니다.<br />
+      이메일을 입력하고 <span style="color: #78c2ad">완료</span> 버튼을
+      클릭해 주세요.
+    </div>
+  </div>
+  {% csrf_token %}
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="user_email"
+          placeholder="이메일을 입력해주세요."
+        />
+      </div>
+      <a
+        onclick="findmyid()"
+        class="btn btn-outline-primary"
+        style="float: right"
+      >
+        완료
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock contents %}

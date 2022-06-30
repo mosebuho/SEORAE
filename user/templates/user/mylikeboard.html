@@ -1,0 +1,85 @@
+{% extends 'user/profile_base.html' %} {% block content %}
+<div class="content">
+  <table class="table table-hover" style="text-align: center">
+    {% if boards %}
+    <thead>
+      <tr class="table-primary" style="font-size: 13px">
+        <th scope="col">번호</th>
+        <th scope="col" style="width: 50%">제목</th>
+        <th scope="col">글쓴이</th>
+        <th scope="col" stlye="widht:5px;">조회수</th>
+        <th scope="col" stlye="widht:5px;">추천수</th>
+        <th scope="col">작성일</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for board in boards %}
+      <tr style="font-size: 14px">
+        <td scope="row">{{ board.id }}</td>
+        <td scope="row" style="display: flex; flex-direction: row">
+          <div>
+            <a
+              href="/board/detail/{{ board.id }}"
+              target="_self"
+              style="text-decoration: none"
+            >
+              {{ board.title }}
+            </a>
+          </div>
+          {% if board.comment_set.all.count == 0 %} {% else %}
+          <div style="font-size: 13px; margin-left: 5px">
+            ({{ board.comment_set.all.count }})
+          </div>
+          {% endif %}
+        </td>
+        <td scope="row">{{ board.writer }}</td>
+        <td scope="row">{{ board.hits }}</td>
+        <td scope="row">{{board.like_count}}</td>
+        <td scope="row">
+          {% if board.created_string == False %} 
+          {{ board.created_string|date:'m월 d일' }} {% else %} 
+          {{ board.created_string }} {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <div
+      class="card"
+      style="width: 100%; height: 300px; text-align: center; padding: 140px"
+    >
+      추천한 글이 없습니다.
+    </div>
+    {% endif %}
+  </table>
+  <div id="paging">
+    <ul class="pagination justify-content-center" style="margin-top: 2rem">
+      {% if boards.has_previous %}
+      <li class="page-item">
+      <a class="page-link" href="?page={{boards.previous_page_number}}"><</a>
+      </li>
+      {% endif %} 
+      {% for page_number in boards.paginator.page_range %} 
+      {% if page_number == boards.number %}
+      <li class="page-item active" aria-current="page">
+        <a class="page-link" href="?&page={{ page_number }}"
+          >{{ page_number }}</a
+        >
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a class="page-link" href="?&page={{ page_number }}"
+          >{{ page_number }}</a
+        >
+        {% endif %}
+        {% endfor %} 
+        {% if boards.has_next %}
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{boards.next_page_number}}">></a>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock content %}
