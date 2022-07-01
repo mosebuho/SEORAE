@@ -7,7 +7,8 @@ from .models import User
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-
+from argon2 import PasswordHasher
+import string, random
 
 def register(request):
     register_form = RegisterForm()
@@ -251,18 +252,25 @@ def findmyid_done(request):
     user_email = request.POST.get("user_email")
     user = User.objects.get(user_email=user_email)
     if user_email:
+        new_pw_len = 12
+        password = string.ascii_letters + string.digits + string.punctuation 
+        new_pw = ""
+        for i in range(new_pw_len):
+            new_pw += random.choice(password)
+        user.user_pw = PasswordHasher().hash(new_pw)
+        user.save()
         data = {
             "user_email": user_email,
         }
-        title = "아이디/비밀번호 정보 안내"
+        title = "아이디/비밀번호 정보"
         content = f"""
         요청하신 계정 정보는 다음과 같습니다.\n\n
         아이디    :  {user.user_id}
         이메일    :  {user.user_email}
         닉네임    :  {user.user_name}
         가입일    :  {user.user_register_dttm}
-        임시 비밀번호 :  {user.user_pw}
-        \n 임시 비밀번호는 해킹의 위험이 있으니 로그인 후 변경해주세요.
+        임시 비밀번호 :  {new_pw}
+        \n 임시 비밀번호는 해킹의 위험이 있으니 반드시 로그인 후 변경해주세요.
         사이트 바로 가기:http://127.0.0.1:8000/home
         """
         mail = EmailMessage(title, content, to=[user_email])
