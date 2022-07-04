@@ -73,6 +73,14 @@
       },
     });
   }
+
+  function user_quit() {
+    var delete_warning = confirm("탈퇴한 계정의 정보는 복구 불가능합니다. \n정말 탈퇴하시겠습니까?");
+    if (delete_warning == true) {
+        window.location.href = "{% url 'user:user_quit' user.pk %}"
+    }
+  }
+
 </script>
 <table class="mb_table" style="width: 100%">
   <tbody>
@@ -119,7 +127,7 @@
   <a href="{% url 'user:mypwchange' user.pk %}" style="text-decoration: none; margin-right:5px;"
     >비밀번호변경</a
   >
-  <a href="{% url 'user:user_quit' user.pk %}" style="text-decoration: none; color:#ff7b7b;"
+  <a onclick="user_quit('{{user.pk}}')" style="text-decoration: none; color:#ff7b7b;"
     >회원탈퇴</a
   >
 </div>

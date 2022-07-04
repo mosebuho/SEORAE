@@ -270,7 +270,7 @@ def findmyid_done(request):
         닉네임    :  {user.user_name}
         가입일    :  {user.user_register_dttm}
         임시 비밀번호 :  {new_pw}
-        \n 임시 비밀번호는 해킹의 위험이 있으니 반드시 로그인 후 변경해주세요.
+        \n 임시 비밀번호는 해킹의 위험이 있으니 반드시 로그인 후 비밀번호를 변경해주세요.
         사이트 바로 가기:http://127.0.0.1:8000/home
         """
         mail = EmailMessage(title, content, to=[user_email])
