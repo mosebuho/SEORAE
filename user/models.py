@@ -7,6 +7,7 @@ class User(models.Model):
     user_email = models.EmailField(max_length=128, unique=True, verbose_name="유저 이메일")
     user_register_dttm = models.DateTimeField(auto_now_add=True, verbose_name="계정 생성시간")
     like_count = models.PositiveIntegerField(default=0, verbose_name="받은 추천 수")
+    point = models.PositiveIntegerField(default=0, verbose_name="포인트")
 
     def __str__(self):
         return self.user_name

@@ -15,7 +15,7 @@ def home(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
     context = {
         "new_board": new_board,
         "hot_board": hot_board,
@@ -37,7 +37,7 @@ def search(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
 
     q = request.POST.get("q", "")
     context = {"login_session": login_session, "q": q, "new_users":new_users, "hot_users":hot_users}

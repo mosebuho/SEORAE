@@ -14,7 +14,7 @@ def register(request):
     register_form = RegisterForm()
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
     context = {"forms": register_form, "new_users": new_users, "hot_users": hot_users}
 
     if request.method == "GET":
@@ -43,7 +43,7 @@ def login(request):
     loginform = LoginForm()
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
     context = {"forms": loginform, "new_users": new_users, "hot_users": hot_users}
 
     if request.method == "GET":
@@ -75,7 +75,7 @@ def profile(request, pk):
     user = get_object_or_404(User, pk=pk)
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
     context = {
         "login_session": login_session,
         "user": user,
@@ -96,7 +96,7 @@ def myboard(request, pk):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
 
     context = {
         "myboard": myboard,
@@ -120,7 +120,7 @@ def mycomment(request, pk):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
 
     context = {
         "login_session": login_session,
@@ -144,7 +144,7 @@ def mylikeboard(request, pk):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
 
     context = {
         "mylikeboard": mylikeboard,
@@ -164,7 +164,7 @@ def mypwchange(request, pk):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
 
     context = {
         "login_session": login_session,
@@ -243,7 +243,7 @@ def user_quit(request, pk):
 def findmyid(request):
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("-point")[:8]
     context = {"new_users": new_users, "hot_users": hot_users}
     return render(request, "user/findmyid.html", context)
 

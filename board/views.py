@@ -21,7 +21,7 @@ def all(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "all_boards": all_boards,
@@ -46,7 +46,7 @@ def free(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "free_boards": free_boards,
@@ -71,7 +71,7 @@ def recipe(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "recipe_boards": recipe_boards,
@@ -96,7 +96,7 @@ def hoogie(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "hoogie_boards": hoogie_boards,
@@ -121,7 +121,7 @@ def question(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "question_boards": question_boards,
@@ -146,7 +146,7 @@ def notice(request):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "notice_boards": notice_boards,
@@ -167,7 +167,7 @@ def write(request):
     user = User.objects.get(id=login_session)
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "login_session": login_session,
@@ -193,6 +193,8 @@ def write(request):
                 board_name=write_form.board_name,
             )
             board.save()
+            user.point += 2
+            user.save()
             return redirect(f"/board/detail/{board.id}/")
         else:
             context["forms"] = write_form
@@ -213,7 +215,7 @@ def detail(request, pk):
 
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
 
     context = {
         "board": board,
@@ -270,7 +272,7 @@ def update(request, pk):
     board = get_object_or_404(Board, pk=pk)
     users = User.objects.all()
     new_users = users.order_by("-id")[:8]
-    hot_users = users.order_by("-like_count")[:8]
+    hot_users = users.order_by("point")[:8]
     context = {
         "login_session": login_session,
         "user": user,
@@ -317,6 +319,8 @@ def comment_write(request, pk):
             writer=user,
         )
         board.save()
+        user.point += 1
+        user.save()
         data = {
             "writer": user.user_name,
             "content": content,
@@ -399,6 +403,7 @@ def like(request):
         if login_session:
             board.like_count -= 1
             writer.like_count -= 1
+            writer.point -= 1
             writer.save()
             board.save()
     elif not login_session:
@@ -408,6 +413,7 @@ def like(request):
         message = "추천"
         if login_session:
             writer.like_count += 1
+            writer.point += 1
             board.like_count += 1
             writer.save()
             board.save()

@@ -10,5 +10,6 @@ class UserAdmin(admin.ModelAdmin):
         "user_name",
         "user_email",
         "like_count",
+        "point",
         "user_register_dttm",
     )
